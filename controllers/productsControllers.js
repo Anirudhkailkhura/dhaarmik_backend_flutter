@@ -20,14 +20,37 @@ module.exports = {
     }
   },
 
-  getProduct : async (res,req) => {
-    const productId = req.params.id
+  getProduct: async (res, req) => {
+    const productId = req.params.id;
     try {
-        const product = await Product.find().findById(productId)
-        const {__v, createAt, ...productData} = product._doc;
-        res.status(200).json(product._doc);
-      } catch (error) {
-        res.status(500).json("failed to get the product");
-      }
-  }
+      const product = await Product.find().findById(productId);
+      const { __v, createAt, ...productData } = product._doc;
+      res.status(200).json(product._doc);
+    } catch (error) {
+      res.status(500).json("failed to get the product");
+    }
+  },
+
+  searchProduct: async (req, res) => {
+    try {
+      const result = await Product.aggregate([
+        [
+          {
+            $search: {
+              index: "dharrmik",
+              text: {
+                query: req.params.key,
+                path: {
+                  wildcard: "*",
+                },
+              },
+            },
+          },
+        ],
+      ]);
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json("failed to get the product");
+    }
+  },
 };
