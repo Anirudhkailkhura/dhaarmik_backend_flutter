@@ -20,16 +20,23 @@ module.exports = {
     }
   },
 
-  getProduct: async (res, req) => {
+  getProduct: async (req, res) => {
     const productId = req.params.id;
     try {
-      const product = await Product.find().findById(productId);
+      const product = await Product.findById(productId);
+      if (!product) {
+        // If the product with the given ID is not found, return an error
+        return res.status(404).json({ error: "Product not found" });
+      }
+
       const { __v, createAt, ...productData } = product._doc;
-      res.status(200).json(product._doc);
+      res.status(200).json(productData);
     } catch (error) {
-      res.status(500).json("failed to get the product");
+      console.error(error);
+      res.status(500).json({ error: "Failed to get the product" });
     }
-  },
+},
+
 
   searchProduct: async (req, res) => {
     try {
