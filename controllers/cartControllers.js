@@ -13,7 +13,7 @@ module.exports = {
           (product) => product.cartItem.toString() === cartItem
         );
 
-        if (existingProduct) {
+        if (existingProduct) {  
           existingProduct.quantity += 1;
         } else {
           cart.products.push({ cartItem, quantity: 1 });
