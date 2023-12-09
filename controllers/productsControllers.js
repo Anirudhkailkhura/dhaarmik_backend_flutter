@@ -38,26 +38,27 @@ module.exports = {
 },
 
 
-  searchProduct: async (req, res) => {
-    try {
-      const result = await Product.aggregate([
-        [
-          {
-            $search: {
-              index: "dharrmik",
-              text: {
-                query: req.params.key,
-                path: {
-                  wildcard: "*",
-                },
+searchProduct: async (req, res) => {
+  try {
+    const result = await Product.aggregate([
+      [
+        {
+          $search: {
+            index: "dharrmik",
+            text: {
+              query: req.params.key,
+              path: {
+                wildcard: "*",
               },
             },
           },
-        ],
-      ]);
-      res.status(200).json(products);
-    } catch (error) {
-      res.status(500).json("failed to get the product");
-    }
-  },
+        },
+      ],
+    ]);
+    res.status(200).json(result);  // Fix: Change from products to result
+  } catch (error) {
+    res.status(500).json("failed to get the product");
+  }
+},
+
 };
