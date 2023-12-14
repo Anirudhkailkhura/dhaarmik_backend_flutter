@@ -6,11 +6,11 @@ module.exports = {
             const user = await User.findById(req.user.id);
 
             // Destructuring the user document and excluding unnecessary fields
-            const { password, __v, createdAt, ...userData } = user._doc;
+            const { password, __v,updatedAt, createdAt, ...userData } = user._doc;
 
             res.status(200).json(userData);
         } catch (error) {
-            res.status(500).json(error);
+            res.status(500).json("error");
         }
     },
 

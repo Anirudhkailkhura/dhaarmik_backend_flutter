@@ -5,14 +5,18 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
 
   if (authHeader) {
-    const token = authHeader.split(" ")(1);
+    // Fix: Use split(" ") instead of split(" ")(1)
+    const token = authHeader.split(" ")[1];
+
     jwt.verify(token, process.env.JWT_SEC, async (err, user) => {
-      if (err) res.status(403).json("invalid token");
+      if (err) {
+        return res.status(403).json({ error: "Invalid token" });
+      }
       req.user = user;
       next();
     });
   } else {
-    return res.status(401).json("you are not authenticated ");
+    return res.status(401).json({ error: "You are not authenticated" });
   }
 };
 

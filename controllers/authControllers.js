@@ -1,7 +1,7 @@
-
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+
 
 module.exports = {
   createUser: async (req, res) => {
@@ -24,66 +24,36 @@ module.exports = {
 
   loginUser: async (req, res) => {
     try {
-      const user = await User.find({ email: req.body.email });
-      !user && res.status(401).json("could not find the user");
+        const user = await User.findOne({ email: req.body.email });
 
-      const decryptedpass = CryptoJS.AES.decrypt(
-        user.password,
-        process.env.SECRET
-      );
-      const thepassword = decryptedpass.toString(CryptoJS.enc.Utf8);
+        if (!user) {
+            return res.status(401).json({ error: "Could not find the user" });
+        }
 
-      thepassword !== req.body.password &&
-        res.status(401).json("wrong password");
+        const decryptedPass = CryptoJS.AES.decrypt(
+            user.password,
+            process.env.SECRET
+        );
+        const decryptedPassword = decryptedPass.toString(CryptoJS.enc.Utf8);
 
-      const userToken = jwt.sign(
-        {
-          id: user._id,
-        },
-        process.env.JWT_SEC,
-        { expiresIn: "21d" }
-      );
+        if (decryptedPassword !== req.body.password) {
+            return res.status(401).json({ error: "Wrong password" });
+        }
 
-      const { password, __v, createdAt, ...others } = user._doc;
-      res.status(200).json({ ...others, token: userToken });
+        const userToken = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SEC,
+            { expiresIn: "21d" }
+        );
+
+        const { password, __v, updatedAt, createdAt, ...others } = user._doc;
+        res.status(200).json({ ...others, token: userToken });
     } catch (error) {
-      res.status(500).json({ ...others, token: userToken });
+        console.error(error);
+        res.status(500).json({ error: "Failed to login" });
     }
-  },
-};
+},
 
+  };
 
-
-// loginUser: async (req, res) => {
-//   try {
-//     const user = await User.findOne({ email: req.body.email });
-
-//     if (!user) {
-//       return res.status(401).json("Could not find the user");
-//     }
-
-//     const decryptedpass = CryptoJS.AES.decrypt(
-//       user.password,
-//       process.env.SECRET
-//     );
-//     const thepassword = decryptedpass.toString(CryptoJS.enc.Utf8);
-
-//     if (thepassword !== req.body.password) {
-//       return res.status(401).json("Wrong password");
-//     }
-
-//     const userToken = jwt.sign(
-//       {
-//         id: user._id,
-//       },
-//       process.env.JWT_SEC,
-//       { expiresIn: "21d" }
-//     );
-
-//     const { password, __v, createdAt, ...others } = user._doc;
-//     res.status(200).json({ ...others, token: userToken });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json("Internal server error");
-//   }
-// },
+  
