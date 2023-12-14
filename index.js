@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
