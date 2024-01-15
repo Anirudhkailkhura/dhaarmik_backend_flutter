@@ -46,7 +46,7 @@ module.exports = {
       res.status(200).json({ ...others, token: userToken });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Failed to login", details: error.message });
+      res.status(500).json({ error: "Failed to login the user", details: error.message });
     }
   },
 };
